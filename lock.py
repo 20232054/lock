@@ -1,142 +1,94 @@
 import random
 
-# 비밀번호를 생성하는 함수
-def generatePassword(pwlength):
+def generatePassword(pwlength, strength="중간"):
+    """
+    선택한 보안등급(strength)에 따라 비밀번호를 생성하는 함수
+
+    - 약함: 5~7자리, 소문자만 포함
+    - 중간: 8~11자리, 소문자, 숫자, 대문자 중 두 가지 포함
+    - 강함: 12자리 이상, 소문자, 숫자, 대문자, 특수문자 모두 포함
+    """
     alphabet = "abcdefghijklmnopqrstuvwxyz"
-    passwords = []
+    special_characters = "!@#$%^&*"
+    password = ""
 
-    for i in pwlength:
-        # 5글자 미만인 경우 에러 메시지 출력 후 넘어감
-        if i < 5:
-            print("Error: 5글자 미만의 비밀번호는 보안에 취약합니다. (요청한 길이:", i, ")")
-            passwords.append("Error")
-            continue
+    # 비밀번호 길이 설정
+    if strength == "약함":
+        length = random.randint(5, 7)
+    elif strength == "중간":
+        length = random.randint(8, 11)
+    elif strength == "강함":
+        length = max(pwlength, 12)  # 강함은 최소 12자 이상
 
-        password = ""
-        for j in range(i):
-            next_letter_index = random.randrange(len(alphabet))
-            password = password + alphabet[next_letter_index]
+    # 강도별 비밀번호 생성
+    for _ in range(length):
+        if strength == "약함":
+            password += random.choice(alphabet)  # 소문자만
+        elif strength == "중간":
+            password += random.choice(alphabet + alphabet.upper() + "0123456789")  # 소문자, 대문자, 숫자
+        elif strength == "강함":
+            # 소문자, 대문자, 숫자, 특수문자 모두 포함
+            password += random.choice(alphabet + alphabet.upper() + "0123456789" + special_characters)
 
-        # 숫자를 비밀번호에 추가
-        password = replaceWithNumber(password)
-
-        # 대문자를 비밀번호에 추가
+    # 강함일 경우, 추가적으로 특수문자와 대문자를 반드시 포함하도록 보정
+    if strength == "강함":
+        password = replaceWithSpecialCharacter(password)
         password = replaceWithUppercaseLetter(password)
 
-        # 특수문자를 비밀번호에 추가
-        password = replaceWithSpecialCharacter(password)
+    return password
 
-        passwords.append(password)
-
-    return passwords
-
-# 비밀번호 문자열에 숫자를 추가하는 함수
-def replaceWithNumber(pword):
-    for i in range(random.randrange(1, 3)):
-        replace_index = random.randrange(len(pword)//2)
-        pword = pword[0:replace_index] + str(random.randrange(10)) + pword[replace_index+1:]
-    return pword
-
-# 비밀번호 문자열에 대문자를 추가하는 함수
-def replaceWithUppercaseLetter(pword):
-    for i in range(random.randrange(1, 3)):
-        replace_index = random.randrange(len(pword)//2, len(pword))
-        pword = pword[0:replace_index] + pword[replace_index].upper() + pword[replace_index+1:]
-    return pword
-
-# 비밀번호 문자열에 특수문자를 추가하는 함수
 def replaceWithSpecialCharacter(pword):
+    """
+    비밀번호에 랜덤 특수문자를 추가
+    """
     special_characters = "!@#$%^&*"
-    for i in range(random.randrange(1, 3)):
-        replace_index = random.randrange(len(pword))
-        selected_char = random.choice(special_characters)
-        pword = pword[0:replace_index] + selected_char + pword[replace_index+1:]
-    return pword
+    replace_index = random.randrange(len(pword))
+    selected_char = random.choice(special_characters)
+    return pword[:replace_index] + selected_char + pword[replace_index + 1:]
 
-# 비밀번호 보안등급을 평가하는 함수
-def evaluatePasswordStrength(password):
+def replaceWithUppercaseLetter(pword):
     """
-    비밀번호의 보안등급을 평가하는 함수
-
-    - 강함: 길이가 12자 이상이고, 숫자, 대문자, 특수문자가 모두 포함된 경우
-    - 중간: 길이가 8자 이상 12자 미만이고, 숫자, 대문자, 특수문자 중 두 가지 이상 포함된 경우
-    - 약함: 길이가 8자 미만이거나, 숫자, 대문자, 특수문자 중 한 가지 이하만 포함된 경우
+    비밀번호에 랜덤 대문자를 추가
     """
-    # 비밀번호의 길이를 계산
-    length = len(password)
+    replace_index = random.randrange(len(pword))
+    return pword[:replace_index] + pword[replace_index].upper() + pword[replace_index + 1:]
 
-    # 비밀번호에 숫자가 포함되어 있는지 확인
-    has_number = any(char.isdigit() for char in password)
-
-    # 비밀번호에 대문자가 포함되어 있는지 확인
-    has_uppercase = any(char.isupper() for char in password)
-
-    # 비밀번호에 특수문자가 포함되어 있는지 확인
-    has_special = any(char in "!@#$%^&*" for char in password)
-
-    # 강함 조건
-    if length >= 12 and has_number and has_uppercase and has_special:
-        return "강함"
-
-    # 중간 조건
-    elif length >= 8 and sum([has_number, has_uppercase, has_special]) >= 2:
-        return "중간"
-
-    # 약함 조건
-    else:
-        return "약함"
-
-# 프로그램의 메인 함수
 def main():
-    numPasswords = int(input("How many passwords do you want to generate? "))
-    print("Generating " + str(numPasswords) + " passwords")
-    passwordLengths = []
-
-    print("Minimum length of password should be 5")
-    for i in range(numPasswords):
-        length = int(input(f"Enter the length of Password #{i + 1}: "))
-        passwordLengths.append(length)
-
-    # 비밀번호를 생성
-    Password = generatePassword(passwordLengths)
+    print("비밀번호 생성 프로그램입니다.")
+    print("원하는 보안등급을 선택하세요:")
+    print("1. 약함")
+    print("2. 중간")
+    print("3. 강함")
 
     while True:
-        # 결과 출력
-        for i in range(numPasswords):
-            if Password[i] == "Error":
-                print(f"Password #{i + 1} = Error: 비밀번호 생성 실패 (길이 부족)")
+        try:
+            strength_choice = int(input("선택 (1-약함, 2-중간, 3-강함): "))
+            if strength_choice == 1:
+                strength = "약함"
+            elif strength_choice == 2:
+                strength = "중간"
+            elif strength_choice == 3:
+                strength = "강함"
             else:
-                strength = evaluatePasswordStrength(Password[i])
-                print(f"Password #{i + 1} = {Password[i]} (보안등급: {strength})")
+                print("1, 2, 3 중에서 선택해주세요.")
+                continue
+            break
+        except ValueError:
+            print("숫자로 입력해주세요.")
 
-        # 추가된 기능: 특정 비밀번호만 재생성
-        while True:
-            regenerate = input("특정 비밀번호를 재생성하시겠습니까? (y/n): ").strip().lower()
+    numPasswords = int(input("몇 개의 비밀번호를 생성하시겠습니까? "))
+    passwords = []
 
-            # 사용자가 재생성을 원하지 않을 경우
-            if regenerate == "n":
-                print("비밀번호 생성이 완료되었습니다.")
-                return
+    for _ in range(numPasswords):
+        if strength == "강함":
+            length = int(input("강한 비밀번호의 길이를 입력하세요 (12 이상): "))
+        else:
+            length = 0  # 약함, 중간은 고정된 범위에서 랜덤하게 결정
+        passwords.append(generatePassword(length, strength))
 
-            # 사용자가 특정 비밀번호 재생성을 원하는 경우
-            elif regenerate == "y":
-                try:
-                    # 재생성할 비밀번호의 번호를 입력
-                    index = int(input(f"재생성할 비밀번호 번호를 입력하세요 (1-{numPasswords}): "))
-                    
-                    # 유효한 번호인지 확인
-                    if 1 <= index <= numPasswords:
-                        # 해당 번호의 비밀번호를 재생성
-                        Password[index - 1] = generatePassword([passwordLengths[index - 1]])[0]
-                        print(f"Password #{index}가 재생성되었습니다.")
-                        break
-                    else:
-                        print(f"Error: 1에서 {numPasswords} 사이의 번호를 입력하세요.")
-                except ValueError:
-                    print("Error: 숫자를 입력하세요.")
-            else:
-                print("잘못된 입력입니다. 'y' 또는 'n'을 입력해주세요.")
-# 메인 함수 실행
+    print("\n생성된 비밀번호:")
+    for i, password in enumerate(passwords, 1):
+        print(f"Password #{i}: {password}")
+
 if __name__ == "__main__":
     main()
-
