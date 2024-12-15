@@ -53,6 +53,19 @@ def replaceWithSpecialCharacter(pword):
         pword = pword[0:replace_index] + selected_char + pword[replace_index+1:]
     return pword
 
+# 비밀번호 보안등급을 안정/불안정으로 평가하는 함수
+def evaluatePasswordStability(password):
+    length = len(password)
+    has_number = any(char.isdigit() for char in password)
+    has_uppercase = any(char.isupper() for char in password)
+    has_special = any(char in "!@#$%^&*" for char in password)
+
+    # 안정적/불안정적 평가
+    if length >= 8 and sum([has_number, has_uppercase, has_special]) >= 2:
+        return "안정적"
+    else:
+        return "불안정적"
+
 # 프로그램의 메인 함수
 def main():
     numPasswords = int(input("How many passwords do you want to generate? "))
@@ -72,7 +85,8 @@ def main():
         if Password[i] == "Error":
             print("Password #" + str(i+1) + " = Error: 비밀번호 생성 실패 (길이 부족)")
         else:
-            print("Password #" + str(i+1) + " = " + Password[i])
+            stability = evaluatePasswordStability(Password[i])
+            print("Password #" + str(i+1) + " = " + Password[i] + " (보안등급: " + stability + ")")
 
 # 메인 함수 실행
 if __name__ == "__main__":
