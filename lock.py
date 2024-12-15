@@ -53,18 +53,42 @@ def replaceWithSpecialCharacter(pword):
         pword = pword[0:replace_index] + selected_char + pword[replace_index+1:]
     return pword
 
-# 비밀번호 보안등급을 평가하는 함수
 def evaluatePasswordStrength(password):
+    """
+    비밀번호의 보안등급을 평가하는 함수
+
+    - 강함: 길이가 12자 이상이고, 숫자, 대문자, 특수문자가 모두 포함된 경우
+    - 중간: 길이가 8자 이상 12자 미만이고, 숫자, 대문자, 특수문자 중 두 가지 이상 포함된 경우
+    - 약함: 길이가 8자 미만이거나, 숫자, 대문자, 특수문자 중 한 가지 이하만 포함된 경우
+    """
+    # 비밀번호의 길이를 계산
     length = len(password)
+
+    # 비밀번호에 숫자가 포함되어 있는지 확인
     has_number = any(char.isdigit() for char in password)
+
+    # 비밀번호에 대문자가 포함되어 있는지 확인
     has_uppercase = any(char.isupper() for char in password)
+
+    # 비밀번호에 특수문자가 포함되어 있는지 확인
     has_special = any(char in "!@#$%^&*" for char in password)
 
-    # 보안등급 평가
+    # 강함 조건
+    # 1. 길이가 12자 이상이어야 함
+    # 2. 숫자, 대문자, 특수문자가 모두 포함되어야 함
     if length >= 12 and has_number and has_uppercase and has_special:
         return "강함"
+
+    # 중간 조건
+    # 1. 길이가 8자 이상 12자 미만이어야 함
+    # 2. 숫자, 대문자, 특수문자 중 두 가지 이상 포함되어야 함
+    #    예: 숫자 + 대문자, 숫자 + 특수문자, 대문자 + 특수문자
     elif length >= 8 and sum([has_number, has_uppercase, has_special]) >= 2:
         return "중간"
+
+    # 약함 조건
+    # 1. 길이가 8자 미만인 경우
+    # 2. 또는 숫자, 대문자, 특수문자 중 하나만 포함된 경우
     else:
         return "약함"
 
