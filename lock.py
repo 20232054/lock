@@ -53,6 +53,7 @@ def replaceWithSpecialCharacter(pword):
         pword = pword[0:replace_index] + selected_char + pword[replace_index+1:]
     return pword
 
+# 비밀번호 보안등급을 평가하는 함수
 def evaluatePasswordStrength(password):
     """
     비밀번호의 보안등급을 평가하는 함수
@@ -74,21 +75,14 @@ def evaluatePasswordStrength(password):
     has_special = any(char in "!@#$%^&*" for char in password)
 
     # 강함 조건
-    # 1. 길이가 12자 이상이어야 함
-    # 2. 숫자, 대문자, 특수문자가 모두 포함되어야 함
     if length >= 12 and has_number and has_uppercase and has_special:
         return "강함"
 
     # 중간 조건
-    # 1. 길이가 8자 이상 12자 미만이어야 함
-    # 2. 숫자, 대문자, 특수문자 중 두 가지 이상 포함되어야 함
-    #    예: 숫자 + 대문자, 숫자 + 특수문자, 대문자 + 특수문자
     elif length >= 8 and sum([has_number, has_uppercase, has_special]) >= 2:
         return "중간"
 
     # 약함 조건
-    # 1. 길이가 8자 미만인 경우
-    # 2. 또는 숫자, 대문자, 특수문자 중 하나만 포함된 경우
     else:
         return "약함"
 
@@ -103,16 +97,40 @@ def main():
         length = int(input("Enter the length of Password #" + str(i+1) + " "))
         passwordLengths.append(length)
 
-    # 비밀번호를 생성
-    Password = generatePassword(passwordLengths)
+    while True:
+        # 비밀번호를 생성
+        Password = generatePassword(passwordLengths)
 
-    # 결과 출력
-    for i in range(numPasswords):
-        if Password[i] == "Error":
-            print("Password #" + str(i+1) + " = Error: 비밀번호 생성 실패 (길이 부족)")
-        else:
-            strength = evaluatePasswordStrength(Password[i])
-            print("Password #" + str(i+1) + " = " + Password[i] + " (보안등급: " + strength + ")")
+        # 결과 출력
+        for i in range(numPasswords):
+            if Password[i] == "Error":
+                print(f"Password #{i + 1} = Error: 비밀번호 생성 실패 (길이 부족)")
+            else:
+                strength = evaluatePasswordStrength(Password[i])
+                print(f"Password #{i + 1} = {Password[i]} (보안등급: {strength})")
+
+        # 추가된 코드: 비밀번호 재설정 여부 확인
+        # 사용자에게 비밀번호를 재설정할지 여부를 묻는 코드
+        while True:
+            # 사용자에게 재설정 여부를 묻는 메시지 출력
+            regenerate = input("비밀번호를 다시 생성하시겠습니까? (y/n): ").strip().lower()
+
+            # 사용자가 'y'를 입력한 경우
+            if regenerate == "y":
+                # 비밀번호 재생성을 위해 반복문을 계속 진행
+                print("비밀번호를 다시 생성합니다.")
+                break  # 내부 루프를 종료하여 비밀번호 재생성 루프로 이동
+
+            # 사용자가 'n'을 입력한 경우
+            elif regenerate == "n":
+                # 재생성을 종료하고 전체 프로그램을 종료할 준비
+                print("비밀번호 생성이 완료되었습니다.")
+                return  # 프로그램 종료
+
+            # 사용자가 잘못된 입력을 한 경우
+            else:
+                # 잘못된 입력임을 알리고 다시 입력하도록 유도
+                print("잘못된 입력입니다. 'y' 또는 'n'을 입력해주세요.")
 
 # 메인 함수 실행
 if __name__ == "__main__":
