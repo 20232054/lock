@@ -94,13 +94,13 @@ def main():
 
     print("Minimum length of password should be 5")
     for i in range(numPasswords):
-        length = int(input("Enter the length of Password #" + str(i+1) + " "))
+        length = int(input(f"Enter the length of Password #{i + 1}: "))
         passwordLengths.append(length)
 
-    while True:
-        # 비밀번호를 생성
-        Password = generatePassword(passwordLengths)
+    # 비밀번호를 생성
+    Password = generatePassword(passwordLengths)
 
+    while True:
         # 결과 출력
         for i in range(numPasswords):
             if Password[i] == "Error":
@@ -109,29 +109,33 @@ def main():
                 strength = evaluatePasswordStrength(Password[i])
                 print(f"Password #{i + 1} = {Password[i]} (보안등급: {strength})")
 
-        # 추가된 코드: 비밀번호 재설정 여부 확인
-        # 사용자에게 비밀번호를 재설정할지 여부를 묻는 코드
+        # 추가된 기능: 특정 비밀번호만 재생성
         while True:
-            # 사용자에게 재설정 여부를 묻는 메시지 출력
-            regenerate = input("비밀번호를 다시 생성하시겠습니까? (y/n): ").strip().lower()
+            regenerate = input("특정 비밀번호를 재생성하시겠습니까? (y/n): ").strip().lower()
 
-            # 사용자가 'y'를 입력한 경우
-            if regenerate == "y":
-                # 비밀번호 재생성을 위해 반복문을 계속 진행
-                print("비밀번호를 다시 생성합니다.")
-                break  # 내부 루프를 종료하여 비밀번호 재생성 루프로 이동
-
-            # 사용자가 'n'을 입력한 경우
-            elif regenerate == "n":
-                # 재생성을 종료하고 전체 프로그램을 종료할 준비
+            # 사용자가 재생성을 원하지 않을 경우
+            if regenerate == "n":
                 print("비밀번호 생성이 완료되었습니다.")
-                return  # 프로그램 종료
+                return
 
-            # 사용자가 잘못된 입력을 한 경우
+            # 사용자가 특정 비밀번호 재생성을 원하는 경우
+            elif regenerate == "y":
+                try:
+                    # 재생성할 비밀번호의 번호를 입력
+                    index = int(input(f"재생성할 비밀번호 번호를 입력하세요 (1-{numPasswords}): "))
+                    
+                    # 유효한 번호인지 확인
+                    if 1 <= index <= numPasswords:
+                        # 해당 번호의 비밀번호를 재생성
+                        Password[index - 1] = generatePassword([passwordLengths[index - 1]])[0]
+                        print(f"Password #{index}가 재생성되었습니다.")
+                        break
+                    else:
+                        print(f"Error: 1에서 {numPasswords} 사이의 번호를 입력하세요.")
+                except ValueError:
+                    print("Error: 숫자를 입력하세요.")
             else:
-                # 잘못된 입력임을 알리고 다시 입력하도록 유도
                 print("잘못된 입력입니다. 'y' 또는 'n'을 입력해주세요.")
-
 # 메인 함수 실행
 if __name__ == "__main__":
     main()
