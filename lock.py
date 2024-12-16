@@ -1,4 +1,5 @@
 import random
+
 # 비밀번호 생성 시 필수 문자를 추가하는 함수
 def addRequiredCharacters(password, required_pool):
     """
@@ -8,14 +9,14 @@ def addRequiredCharacters(password, required_pool):
     replace_index = random.randrange(len(password))
     required_char = random.choice(required_pool)
     return password[:replace_index] + required_char + password[replace_index + 1:]
+
 # 비밀번호 생성 함수
 def generatePassword(strength="중간", include_chars="", exclude_chars=""):
     """
-    선택한 보안등급(strength)에 따라 비밀번호를 생성하며,
-    사용자가 지정한 문자를 포함하거나 제외할 수 있습니다.
+    선택한 보안등급에 따라 비밀번호를 생성합니다.
     - 약함: 5~6자리, 소문자만 포함
-    - 중간: 7~8자리, 소문자, 숫자, 대문자 중 두 가지 포함
-    - 강함: 9~11자리, 소문자, 숫자, 대문자, 특수문자 모두 포함
+    - 중간: 7~8자리, 소문자, 숫자, 대문자 중 하나 포함
+    - 강함: 9~11자리, 소문자, 숫자, 대문자, 특수문자 포함
     """
     alphabet = "abcdefghijklmnopqrstuvwxyz"
     special_characters = "!@#$%^&*"
@@ -29,20 +30,17 @@ def generatePassword(strength="중간", include_chars="", exclude_chars=""):
     elif strength == "강함":
         length = random.randint(9, 11)
 
-    # 기본 문자 풀 생성
+    # 기본 문자 풀 설정 및 제외할 문자 제거
     char_pool = alphabet + alphabet.upper() + "0123456789" + special_characters
-
-    # 제외할 문자를 필터링
     for char in exclude_chars:
         char_pool = char_pool.replace(char, "")
 
-    # 강도별 비밀번호 생성
+    # 비밀번호 생성
     for _ in range(length - len(include_chars)):
         password += random.choice(char_pool)
 
-    # 사용자가 포함하고 싶은 문자를 비밀번호에 추가
+    # 사용자 포함 문자 추가
     password += include_chars
-
 
     # 강도에 따라 필수 문자 보장
     if strength == "강함":
@@ -72,12 +70,13 @@ def evaluatePasswordStrength(password):
         return "중간"
     else:
         return "약함"
+
 # 사용자 입력 검증 함수
 def getValidatedInput(prompt, valid_range=None):
     """
     사용자 입력을 검증하는 함수.
     - prompt: 입력 요청 메시지
-    - valid_range: 유효한 입력값의 범위 (리스트나 튜플)
+    - valid_range: 유효한 입력값의 범위
     """
     while True:
         try:
@@ -116,7 +115,7 @@ def main():
     for i, strength in enumerate(strengths):
         passwords.append(generatePassword(strength, include_chars, exclude_chars))
 
-    # 출력 형식 개선
+    # 출력 및 재생성
     while True:
         print("\n생성된 비밀번호:")
         print(f"{'번호':<5} {'비밀번호':<20} {'보안등급':<10}")
@@ -125,7 +124,6 @@ def main():
             strength = evaluatePasswordStrength(password)
             print(f"{i:<5} {password:<20} {strength:<10}")
 
-        # 특정 비밀번호 재생성
         regenerate = input("특정 비밀번호를 재생성하시겠습니까? (y/n): ").strip().lower()
         if regenerate == "y":
             index = getValidatedInput(f"재생성할 비밀번호 번호를 입력하세요 (1-{numPasswords}): ", valid_range=range(1, numPasswords + 1))
@@ -137,6 +135,7 @@ def main():
         else:
             print("[Error]: 잘못된 입력입니다. 'y' 또는 'n'을 입력해주세요.")
 
+# 프로그램 실행
 if __name__ == "__main__":
     main()
 
