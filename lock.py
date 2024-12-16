@@ -20,19 +20,20 @@ def getValidatedInput(prompt, valid_range=None):
 # 비밀번호 생성 함수
 def generatePassword(strength="중간", include_chars="", exclude_chars=""):
     """
-    보안등급에 따라 비밀번호를 생성하는 함수
+    보안등급에 따라 비밀번호를 생성하며, 사용자가 지정한 문자를 포함하거나 제외할 수 있습니다.
     """
     alphabet = "abcdefghijklmnopqrstuvwxyz"
     special_characters = "!@#$%^&*"
-    password = ""
 
-    # 비밀번호 길이 설정
-    if strength == "약함":
-        length = random.randint(5, 6)
-    elif strength == "중간":
-        length = random.randint(7, 8)
-    elif strength == "강함":
-        length = random.randint(9, 11)
+    # 보안등급별 길이 범위 정의
+    length_ranges = {
+        "약함": (5, 6),
+        "중간": (7, 8),
+        "강함": (9, 11)
+    }
+
+    # 보안등급에 따른 길이 설정
+    length = random.randint(*length_ranges[strength])
 
     # 기본 문자 풀 생성
     char_pool = alphabet + alphabet.upper() + "0123456789" + special_characters
@@ -41,21 +42,19 @@ def generatePassword(strength="중간", include_chars="", exclude_chars=""):
     for char in exclude_chars:
         char_pool = char_pool.replace(char, "")
 
-    # 강도별 비밀번호 생성
-    for _ in range(length):
-        password += random.choice(char_pool)
+    # 비밀번호 생성
+    password = ''.join(random.choice(char_pool) for _ in range(length))
 
-    # 사용자가 포함하고 싶은 문자를 비밀번호에 추가
+    # 사용자가 포함하고 싶은 문자를 추가
     password += include_chars
 
-    # 강함일 경우 특수문자와 대문자를 보장
+    # 강함 등급일 경우 특수문자와 대문자를 반드시 포함
     if strength == "강함":
         password = replaceWithSpecialCharacter(password)
         password = replaceWithUppercaseLetter(password)
 
     # 비밀번호를 랜덤하게 섞기
-    password = ''.join(random.sample(password, len(password)))
-
+    return ''.join(random.sample(password, len(password)))
     return password
 
 # 비밀번호에 특수문자를 추가
