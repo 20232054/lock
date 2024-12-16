@@ -43,31 +43,23 @@ def generatePassword(strength="중간", include_chars="", exclude_chars=""):
     # 사용자가 포함하고 싶은 문자를 비밀번호에 추가
     password += include_chars
 
-    # 강함일 경우 특수문자와 대문자를 보장
+
+    # 강도에 따라 필수 문자 보장
     if strength == "강함":
-        password = replaceWithSpecialCharacter(password)
-        password = replaceWithUppercaseLetter(password)
+        password = addRequiredCharacters(password, "0123456789")
+        password = addRequiredCharacters(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+        password = addRequiredCharacters(password, special_characters)
+    elif strength == "중간":
+        password = addRequiredCharacters(password, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-    # 비밀번호를 랜덤하게 섞기
+    # 비밀번호 섞기
     password = ''.join(random.sample(password, len(password)))
-
     return password
 
-# 비밀번호에 특수문자를 추가
-def replaceWithSpecialCharacter(password):
-    special_characters = "!@#$%^&*"
-    replace_index = random.randrange(len(password))
-    return password[:replace_index] + random.choice(special_characters) + password[replace_index + 1:]
-
-# 비밀번호에 대문자를 추가
-def replaceWithUppercaseLetter(password):
-    replace_index = random.randrange(len(password))
-    return password[:replace_index] + password[replace_index].upper() + password[replace_index + 1:]
-
-# 비밀번호 보안등급 평가
+# 비밀번호 보안 등급 평가 함수
 def evaluatePasswordStrength(password):
     """
-    비밀번호의 보안 등급을 평가하는 함수
+    비밀번호의 보안 등급을 평가합니다.
     """
     length = len(password)
     has_number = any(char.isdigit() for char in password)
@@ -76,11 +68,10 @@ def evaluatePasswordStrength(password):
 
     if length >= 9 and has_number and has_uppercase and has_special:
         return "강함"
-    elif length >= 7 and sum([has_number, has_uppercase, has_special]) >= 2:
+    elif length >= 7 and (has_number or has_uppercase):
         return "중간"
     else:
         return "약함"
-
 # 사용자 입력 검증 함수
 def getValidatedInput(prompt, valid_range=None):
     """
