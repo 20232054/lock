@@ -71,45 +71,49 @@ def evaluatePasswordStrength(password):
         return "약함"
 
 # 사용자 입력 함수
-def getUserInputs():
-    numPasswords = int(input("몇 개의 비밀번호를 생성하시겠습니까? "))
-    print("원하는 보안등급을 선택하세요:")
-    print("1. 약함")
-    print("2. 중간")
-    print("3. 강함")
+def getUserInputs(numPasswords):
+    strengths = []
+    for i in range(1, numPasswords + 1):
+        print(f"\n비밀번호 #{i}의 보안등급을 선택하세요:")
+        print("1. 약함")
+        print("2. 중간")
+        print("3. 강함")
 
-    while True:
-        try:
-            choice = int(input("선택 (1-약함, 2-중간, 3-강함): "))
-            if choice == 1:
-                strength = "약함"
-            elif choice == 2:
-                strength = "중간"
-            elif choice == 3:
-                strength = "강함"
-            else:
-                print("1, 2, 3 중에서 선택해주세요.")
-                continue
-            break
-        except ValueError:
-            print("숫자로 입력해주세요.")
+        while True:
+            try:
+                choice = int(input("선택 (1-약함, 2-중간, 3-강함): "))
+                if choice == 1:
+                    strengths.append("약함")
+                elif choice == 2:
+                    strengths.append("중간")
+                elif choice == 3:
+                    strengths.append("강함")
+                else:
+                    print("1, 2, 3 중에서 선택해주세요.")
+                    continue
+                break
+            except ValueError:
+                print("숫자로 입력해주세요.")
 
-    return numPasswords, strength
+    return strengths
 
 # 메인 함수
 def main():
-    numPasswords, strength = getUserInputs()
+    numPasswords = int(input("몇 개의 비밀번호를 생성하시겠습니까? "))
     passwords = []
 
     # 사용자 정의 옵션 입력
-    include_chars = input("비밀번호에 반드시 포함할 문자를 입력하세요 (없으면 Enter): ")
-    exclude_chars = input("비밀번호에서 제외할 문자를 입력하세요 (없으면 Enter): ")
+    include_chars = input("모든 비밀번호에 반드시 포함할 문자를 입력하세요 (없으면 Enter): ")
+    exclude_chars = input("모든 비밀번호에서 제외할 문자를 입력하세요 (없으면 Enter): ")
 
-    for _ in range(numPasswords):
+    # 각 비밀번호의 보안등급 입력
+    strengths = getUserInputs(numPasswords)
+
+    for i, strength in enumerate(strengths):
         if strength == "강함":
-            length = int(input("강한 비밀번호의 길이를 입력하세요 (12 이상): "))
+            length = int(input(f"비밀번호 #{i + 1}의 길이를 입력하세요 (12 이상): "))
         else:
-            length = 0
+            length = 0  # 약함, 중간은 고정된 범위에서 랜덤하게 결정
         passwords.append(generatePassword(length, strength, include_chars, exclude_chars))
 
     while True:
@@ -123,11 +127,11 @@ def main():
             try:
                 index = int(input(f"재생성할 비밀번호 번호를 입력하세요 (1-{numPasswords}): "))
                 if 1 <= index <= numPasswords:
-                    if strength == "강함":
-                        length = int(input("강한 비밀번호의 길이를 입력하세요 (12 이상): "))
+                    if strengths[index - 1] == "강함":
+                        length = int(input(f"비밀번호 #{index}의 길이를 입력하세요 (12 이상): "))
                     else:
                         length = 0
-                    passwords[index - 1] = generatePassword(length, strength, include_chars, exclude_chars)
+                    passwords[index - 1] = generatePassword(length, strengths[index - 1], include_chars, exclude_chars)
                     print(f"Password #{index}가 재생성되었습니다.")
                 else:
                     print(f"Error: 1에서 {numPasswords} 사이의 번호를 입력하세요.")
