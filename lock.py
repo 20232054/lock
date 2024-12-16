@@ -71,18 +71,21 @@ def replaceWithUppercaseLetter(password):
 # 비밀번호 보안등급 평가
 def evaluatePasswordStrength(password):
     """
-    생성된 비밀번호의 보안등급(약함, 중간, 강함)을 평가하는 함수
+    비밀번호의 보안등급(약함, 중간, 강함)을 평가하는 함수.
+    - 강함: 길이 ≥ 9, 숫자 ≥ 2, 대문자 ≥ 2, 특수문자 ≥ 1
+    - 중간: 길이 ≥ 7, 숫자 ≥ 1, 대문자 ≥ 1, 특수문자 ≥ 1
+    - 약함: 길이 ≥ 5
     """
     length = len(password)
-    has_number = any(char.isdigit() for char in password)
-    has_uppercase = any(char.isupper() for char in password)
-    has_special = any(char in "!@#$%^&*" for char in password)
+    num_digits = sum(char.isdigit() for char in password)
+    num_uppercase = sum(char.isupper() for char in password)
+    num_special = sum(char in "!@#$%^&*" for char in password)
 
-    if length >= 9 and length < 12 and has_number and has_uppercase and has_special:
+    if length >= 9 and num_digits >= 2 and num_uppercase >= 2 and num_special >= 1:
         return "강함"
-    elif length >= 7 and length < 9 and sum([has_number, has_uppercase, has_special]) >= 2:
+    elif length >= 7 and num_digits >= 1 and num_uppercase >= 1 and num_special >= 1:
         return "중간"
-    elif length >= 5 and length < 7:
+    elif length >= 5:
         return "약함"
     else:
         return "보안 등급 없음"
