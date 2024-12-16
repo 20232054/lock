@@ -5,9 +5,9 @@ def generatePassword(strength="중간", include_chars="", exclude_chars=""):
     """
     선택한 보안등급(strength)에 따라 비밀번호를 생성하며,
     사용자가 지정한 문자를 포함하거나 제외할 수 있습니다.
-    - 약함: 5~7자리, 소문자만 포함
-    - 중간: 7~9자리, 소문자, 숫자, 대문자 중 두 가지 포함
-    - 강함: 9~12자리, 소문자, 숫자, 대문자, 특수문자 모두 포함
+    - 약함: 5~6자리, 소문자만 포함
+    - 중간: 7~8자리, 소문자, 숫자, 대문자 중 두 가지 포함
+    - 강함: 9~11자리, 소문자, 숫자, 대문자, 특수문자 모두 포함
     """
     alphabet = "abcdefghijklmnopqrstuvwxyz"
     special_characters = "!@#$%^&*"
@@ -58,6 +58,9 @@ def replaceWithUppercaseLetter(password):
 
 # 비밀번호 보안등급 평가
 def evaluatePasswordStrength(password):
+    """
+    비밀번호의 보안 등급을 평가하는 함수
+    """
     length = len(password)
     has_number = any(char.isdigit() for char in password)
     has_uppercase = any(char.isupper() for char in password)
@@ -81,20 +84,18 @@ def getValidatedInput(prompt, valid_range=None):
         try:
             user_input = int(input(prompt))
             if valid_range and user_input not in valid_range:
-                print(f"Error: {valid_range[0]}에서 {valid_range[-1]} 사이의 숫자를 입력하세요.")
+                print(f"[Error]: {valid_range[0]}에서 {valid_range[-1]} 사이의 숫자를 입력하세요.")
                 continue
             return user_input
         except ValueError:
-            print("Error: 숫자를 입력하세요.")
+            print("[Error]: 유효한 숫자를 입력하세요.")
 
 # 메인 함수
 def main():
     """
     프로그램의 메인 함수
-    - 비밀번호 개수, 보안등급, 사용자 정의 문자 포함/제외 기능 제공
-    - 생성된 비밀번호 출력 및 특정 비밀번호 재생성 기능 제공
     """
-    print("비밀번호 생성 프로그램입니다.")
+    print("=== 비밀번호 생성 프로그램 ===")
     numPasswords = getValidatedInput("몇 개의 비밀번호를 생성하시겠습니까? ")
     passwords = []
 
@@ -106,9 +107,9 @@ def main():
     strengths = []
     for i in range(1, numPasswords + 1):
         print(f"\n비밀번호 #{i}의 보안등급을 선택하세요:")
-        print("1. 약함 (5 이상 7 미만)")
-        print("2. 중간 (7 이상 9 미만)")
-        print("3. 강함 (9 이상 12 미만)")
+        print("1. 약함 (5~6자리)")
+        print("2. 중간 (7~8자리)")
+        print("3. 강함 (9~11자리)")
         choice = getValidatedInput("선택 (1-약함, 2-중간, 3-강함): ", valid_range=[1, 2, 3])
         strengths.append(["약함", "중간", "강함"][choice - 1])
 
@@ -130,12 +131,12 @@ def main():
         if regenerate == "y":
             index = getValidatedInput(f"재생성할 비밀번호 번호를 입력하세요 (1-{numPasswords}): ", valid_range=range(1, numPasswords + 1))
             passwords[index - 1] = generatePassword(strengths[index - 1], include_chars, exclude_chars)
-            print(f"Password #{index}가 재생성되었습니다.")
+            print(f"[Info]: 비밀번호 #{index}가 재생성되었습니다.")
         elif regenerate == "n":
-            print("비밀번호 생성이 완료되었습니다.")
+            print("비밀번호 생성이 완료되었습니다. 프로그램을 종료합니다.")
             break
         else:
-            print("잘못된 입력입니다. 'y' 또는 'n'을 입력해주세요.")
+            print("[Error]: 잘못된 입력입니다. 'y' 또는 'n'을 입력해주세요.")
 
 if __name__ == "__main__":
     main()
