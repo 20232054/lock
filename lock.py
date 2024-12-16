@@ -1,5 +1,13 @@
 import random
-
+# 비밀번호 생성 시 필수 문자를 추가하는 함수
+def addRequiredCharacters(password, required_pool):
+    """
+    비밀번호에 필수 문자를 추가하는 함수.
+    필수 문자 집합에서 문자를 선택해 비밀번호에 삽입합니다.
+    """
+    replace_index = random.randrange(len(password))
+    required_char = random.choice(required_pool)
+    return password[:replace_index] + required_char + password[replace_index + 1:]
 # 비밀번호 생성 함수
 def generatePassword(strength="중간", include_chars="", exclude_chars=""):
     """
